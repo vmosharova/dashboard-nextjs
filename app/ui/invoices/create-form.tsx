@@ -1,3 +1,5 @@
+'use client';
+
 import { CustomerField } from '@/app/lib/definitions';
 import Link from 'next/link';
 import {
@@ -8,10 +10,16 @@ import {
 } from '@heroicons/react/24/outline';
 import { Button } from '@/app/ui/button';
 import { createInvoice } from '@/app/lib/actions';
+import { useActionState } from 'react';
+import { State } from '@/app/lib/actions';
 
 export default function Form({ customers }: { customers: CustomerField[] }) {
+
+  const initialState: State = { message: null, errors: {} }
+  const [state, formAction] = useActionState(createInvoice, initialState);
+
   return (
-    <form action={createInvoice}>
+    <form action={formAction}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* Customer Name */}
         <div className="mb-4">
@@ -23,7 +31,8 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
               id="customer"
               name="customerId"
               className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              defaultValue=""
+              defaultValue={state.formData?.customerId ?? ""}
+              aria-describedby="customer-error"
             >
               <option value="" disabled>
                 Select a customer
@@ -35,6 +44,14 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
               ))}
             </select>
             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
+          </div>
+          <div id="customer-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.customerId &&
+              state.errors.customerId.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  Please select a customer.
+                </p>
+              ))}
           </div>
         </div>
 
@@ -50,10 +67,20 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
                 name="amount"
                 type="number"
                 step="0.01"
+                defaultValue={state.formData?.amount ?? ""}
+                aria-describedby="amount-error"
                 placeholder="Enter USD amount"
                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
               <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            </div>
+            <div id="amount-error" aria-live="polite" aria-atomic="true">
+              {state.errors?.amount &&
+                state.errors.amount.map((error: string) => (
+                  <p className="mt-2 text-sm text-red-500" key={error}>
+                    Please enter the amount.
+                  </p>
+                ))}
             </div>
           </div>
         </div>
@@ -71,6 +98,8 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
                   name="status"
                   type="radio"
                   value="pending"
+                  defaultChecked={state.formData?.status === 'pending'}
+                  aria-describedby="status-error"
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                 />
                 <label
@@ -86,6 +115,8 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
                   name="status"
                   type="radio"
                   value="paid"
+                  defaultChecked={state.formData?.status === 'paid'}
+                  aria-describedby="status-error"
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                 />
                 <label
@@ -94,6 +125,14 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
                 >
                   Paid <CheckIcon className="h-4 w-4" />
                 </label>
+              </div>
+              <div id="status-error" aria-live="polite" aria-atomic="true">
+                {state.errors?.status &&
+                  state.errors.status.map((error: string) => (
+                    <p className="mt-2 text-sm text-red-500" key={error}>
+                      Please choose the invoice status.
+                    </p>
+                  ))}
               </div>
             </div>
           </div>
