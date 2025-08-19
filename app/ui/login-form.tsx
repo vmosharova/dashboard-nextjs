@@ -72,6 +72,9 @@ export default function LoginForm() {
         <Button className="mt-4 w-full" aria-disabled={isPending}>
           Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
         </Button>
+        <div className="mb-3 mt-2 block text-xs text-gray-600">
+          Use user[at]nextmail[dot]com and 123456 to try it out.
+        </div>
         <div className="flex h-8 items-end space-x-1">
           {errorMessage && (
             <>
